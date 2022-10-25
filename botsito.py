@@ -1,13 +1,8 @@
-from multiprocessing import connection
-from pstats import Stats
-from sys import flags
-from urllib import request
 import discord
 import requests
-
-import sqlite3
-connectionDB = sqlite3.connect("siu.db")
-cur = connectionDB.cursor()
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 
 intents = discord.Intents.default()
@@ -23,6 +18,18 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
+
+    if message.content.startswith('$help'):
+        await message.channel.send(f'Hola, <@{message.author.id}>, esta es la lista de comandos que se pueden usar en este Bot ACTUALMENTE.')
+        await message.channel.send(f'Para usar la Calculadora se debe poner $calc y la operación.')
+        await message.channel.send(f'Para usar el cotizador de CriptoMonedas se debe poner $crypto más la cripto y la divisa.')
+        await message.channel.send(f'Para ver el clima de los paises y ciudades se debe poner $clima y el nombre del país o ciudad,')
+        await message.channel.send(f'Para ver información de los paises $info y el nombre del país.')
+        await message.channel.send(f'Para Obtener la informacion de los jugadores de la MLB se debe poner $jugador más el nombre y apellido.')
+
+
+        
+
         # Calculadora
     if message.content.startswith('$calc'):
         operacion = message.content.split (' ')[1]
@@ -64,6 +71,8 @@ async def on_message(message):
         await message.channel.send(f'El precio es: {price}')
         await message.channel.send(f'El precio mas alto es: {high}')
         await message.channel.send(f'El precio mas bajo es: {low}')
+
+
         # clima
     if message.content.startswith('$clima'):
         ciudad = message.content.split(' ')[1]
@@ -78,6 +87,8 @@ async def on_message(message):
         await message.channel.send(f'El dia de hoy es: {todayTemp}')
         await message.channel.send(f'El dia de mañana sera: {tomorrowTemp}')
         await message.channel.send(f'El dia de pasado mañana sera: {tomorrow2Temp}')
+
+
         # informancion de los paises
     if message.content.startswith('$info'):
         if len(message.content) > 5:
@@ -188,4 +199,4 @@ async def on_message(message):
         
 
 
-client.run('MTAyOTA4MDI3OTI1NzcyNzEzNw.GY5W-v.kxRfgXiQBFbT_dZnpj-UoRxzEQ6vSvBRx-1OAA')
+client.run(os.environ['TOKEN'])
