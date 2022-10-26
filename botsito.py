@@ -26,7 +26,9 @@ async def on_message(message):
         -Para usar el cotizador de CriptoMonedas se debe poner **$crypto** más la cripto y la divisa.
         -Para ver el clima de los paises y ciudades se debe poner **$clima** y el nombre del país o ciudad.
         -Para ver información de los paises **$info** y el nombre del país.
-        -Para Obtener la informacion de los jugadores de la MLB se debe poner **$jugador** más el nombre y apellido.
+        -Para obtener la información de los jugadores de la MLB se debe poner **$jugador** más el nombre y apellido.
+        -Para obtener las estadisticas por año de los jugadores de la MLB se debe poner **$stats** más el nombre, el apellido y el año.
+        -Para obtener las estadisticas de toda la trayectoria de los jugadores de la MLB se debe poner **$trayectory** más el nombre, el apellido del jugador.
         """)
 
         # Calculadora
