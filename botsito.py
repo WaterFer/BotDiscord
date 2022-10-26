@@ -20,15 +20,14 @@ async def on_message(message):
         return
 
     if message.content.startswith('$help'):
-        await message.channel.send(f'Hola, <@{message.author.id}>, esta es la lista de comandos que se pueden usar en este Bot ACTUALMENTE.')
-        await message.channel.send(f'Para usar la Calculadora se debe poner $calc y la operación.')
-        await message.channel.send(f'Para usar el cotizador de CriptoMonedas se debe poner $crypto más la cripto y la divisa.')
-        await message.channel.send(f'Para ver el clima de los paises y ciudades se debe poner $clima y el nombre del país o ciudad,')
-        await message.channel.send(f'Para ver información de los paises $info y el nombre del país.')
-        await message.channel.send(f'Para Obtener la informacion de los jugadores de la MLB se debe poner $jugador más el nombre y apellido.')
-
-
-        
+        await message.channel.send(f"""
+         Hola, <@{message.author.id}>, esta es la lista de comandos que se pueden usar en este Bot ACTUALMENTE.
+        -Para usar la Calculadora se debe poner **$calc** y la operación.
+        -Para usar el cotizador de CriptoMonedas se debe poner **$crypto** más la cripto y la divisa.
+        -Para ver el clima de los paises y ciudades se debe poner **$clima** y el nombre del país o ciudad.
+        -Para ver información de los paises **$info** y el nombre del país.
+        -Para Obtener la informacion de los jugadores de la MLB se debe poner **$jugador** más el nombre y apellido.
+        """)
 
         # Calculadora
     if message.content.startswith('$calc'):
@@ -91,6 +90,8 @@ async def on_message(message):
 
         # informancion de los paises
     if message.content.startswith('$info'):
+
+
         if len(message.content) > 5:
             pais = message.content.split(' ')[1]
             info = requests.get(f'https://goweather.herokuapp.com/weather/{pais}')
@@ -142,8 +143,15 @@ async def on_message(message):
             await message.channel.send(f'{flags}')
 
 
-        # Baseball information 
+        # Baseball information
             # informacion de jugador de baseball
+    def JugadorID(full_name):
+        info = requests.get(f'https://lookup-service-prod.mlb.com/json/named.search_player_all.bam?sport_code=%27&name_part=%27{full_name}%25%27')
+        responseIp = info.json()
+        JugadorID = responseIp['search_player_all']['queryResults']['row']['player_id']
+        return JugadorID
+
+
     if message.content.startswith('$jugador'):
         nameJugador = message.content.split(' ')[1]
         lastJugador = message.content.split(' ')[2]
@@ -152,7 +160,7 @@ async def on_message(message):
         info = requests.get(f'https://lookup-service-prod.mlb.com/json/named.search_player_all.bam?sport_code=%27&name_part=%27{full_name}%25%27')
         responseIp = info.json()
         JugadorID = responseIp['search_player_all']['queryResults']['row']['player_id']
-        p = f"https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/{JugadorID}/headshot/67/current"
+        FotoJ = f"https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/{JugadorID}/headshot/67/current"
 
         infoJugador = requests.get(f"http://lookup-service-prod.mlb.com/json/named.player_info.bam?sport_code='mlb'&player_id='{JugadorID}'")
         responseJugador = infoJugador.json()
@@ -168,7 +176,7 @@ async def on_message(message):
         bateo = responseJugador['player_info']['queryResults']['row']['bats']
         posicion = responseJugador['player_info']['queryResults']['row']['primary_position_txt']
         debut = responseJugador['player_info']['queryResults']['row']['pro_debut_date']
-       
+
         date = Nacimiento.split('T')[0]
         date_debut = debut.split('T')[0]
         #weight in kg
@@ -179,7 +187,7 @@ async def on_message(message):
         m_round = round(height_m, 2)
 
 
-        await message.channel.send(f'{p}')
+        await message.channel.send(f'{FotoJ}')
         await message.channel.send(f'Apellido, Nombre: {Jugador}')
         await message.channel.send(f'Nacionalidad: {Nacionalidad}')
         await message.channel.send(f'Es de la ciudad de {Ciudad}')
@@ -188,15 +196,79 @@ async def on_message(message):
         await message.channel.send(f'Mide {m_round}m')
         await message.channel.send(f'Pesa {kg_round}Kg')
         await message.channel.send(f'Actualmente juega con los {EquipoActual}')
-        await message.channel.send(f'Debuto el {date_debut}')  
+        await message.channel.send(f'Debuto el {date_debut}')
         await message.channel.send(f'Batea en el perfil {bateo}')
         await message.channel.send(f'Juega en {posicion}')
 
         # estadisticas del jugador
-        
-        
+    if message.content.startswith('$stats'):
 
-        
+        nameJugador = message.content.split(' ')[1]
+        lastJugador = message.content.split(' ')[2]
+        year =  message.content.split(' ')[3]
+        full_name = f'{nameJugador} {lastJugador}'
+        result_id = JugadorID(full_name)
+        FotoJ = f"https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/{result_id}/headshot/67/current"
+        details = requests.get(f"http://lookup-service-prod.mlb.com/json/named.sport_hitting_tm.bam?league_list_id='mlb'&game_type='R'&season='{year}'&player_id='{result_id}'")
+        response_career = details.json()
+
+        Hits = response_career['sport_hitting_tm']['queryResults']['row']['h']
+        HomeRun = response_career['sport_hitting_tm']['queryResults']['row']['hr']
+        Carreras = response_career['sport_hitting_tm']['queryResults']['row']['r']
+        Ponches = response_career['sport_hitting_tm']['queryResults']['row']['so']
+        BasexBola = response_career['sport_hitting_tm']['queryResults']['row']['bb']
+        Avg = response_career['sport_hitting_tm']['queryResults']['row']['avg']
+        TurnoAlBate  = response_career['sport_hitting_tm']['queryResults']['row']['ab']
+        Jjugados = response_career['sport_hitting_tm']['queryResults']['row']['g']
+        CarreraImpulsada = response_career['sport_hitting_tm']['queryResults']['row']['rbi']
+        Season = response_career['sport_hitting_tm']['queryResults']['row']['season']
+
+        await message.channel.send(f'{FotoJ}')
+        await message.channel.send(f'Temporada: {Season}')
+        await message.channel.send(f'Juegos jugados: {Jjugados} ')
+        await message.channel.send(f'Turnos al bate: {TurnoAlBate}')
+        await message.channel.send(f'Carreras: {Carreras}')
+        await message.channel.send(f'Hits: {Hits}')
+        await message.channel.send(f'Carrara impulsada: {CarreraImpulsada}')
+        await message.channel.send(f'Base por bola: {BasexBola}')
+        await message.channel.send(f'Ponches: {Ponches}')
+        await message.channel.send(f'HomeRuns: {HomeRun}')
+        await message.channel.send(f'PRO: {Avg}')
+
+    if message.content.startswith('$trayectory'):
+        nameJugador = message.content.split(' ')[1]
+        lastJugador = message.content.split(' ')[2]
+        full_name = f'{nameJugador} {lastJugador}'
+        result_id = JugadorID(full_name)
+        FotoJ = f"https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/{result_id}/headshot/67/current"
+        details = requests.get(f"http://lookup-service-prod.mlb.com/json/named.sport_career_hitting.bam?league_list_id='mlb'&game_type='R'&player_id='{result_id}'")
+        response_career = details.json()
+
+        Hits = response_career['sport_career_hitting']['queryResults']['row']['h']
+        HomeRun = response_career['sport_career_hitting']['queryResults']['row']['hr']
+        Carreras = response_career['sport_career_hitting']['queryResults']['row']['r']
+        Ponches = response_career['sport_career_hitting']['queryResults']['row']['so']
+        BasexBola = response_career['sport_career_hitting']['queryResults']['row']['bb']
+        Avg = response_career['sport_career_hitting']['queryResults']['row']['avg']
+        TurnoAlBate  = response_career['sport_career_hitting']['queryResults']['row']['ab']
+        Jjugados = response_career['sport_career_hitting']['queryResults']['row']['g']
+        CarreraImpulsada = response_career['sport_career_hitting']['queryResults']['row']['rbi']
+
+        await message.channel.send(f'{FotoJ}')
+        await message.channel.send(f'Juegos jugados: {Jjugados} ')
+        await message.channel.send(f'Turnos al bate: {TurnoAlBate}')
+        await message.channel.send(f'Carreras: {Carreras}')
+        await message.channel.send(f'Hits: {Hits}')
+        await message.channel.send(f'Carreras impulsadas: {CarreraImpulsada}')
+        await message.channel.send(f'Bases por bola: {BasexBola}')
+        await message.channel.send(f'Ponches: {Ponches}')
+        await message.channel.send(f'HomeRuns: {HomeRun}')
+        await message.channel.send(f'PRO: {Avg}')
+
+    if message.content.startswith('$team'):
+        nameTeam = message.content.split(' ')[1]
+
+
 
 
 client.run(os.environ['TOKEN'])
